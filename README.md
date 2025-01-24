@@ -49,7 +49,7 @@ Caso não tenha, instale a SDK do .NET aqui.
 
 2. Clone o repositório:
 
-git clone https://github.com/seu-usuario/tic-tac-toe.git
+git clone https://github.com/borgelevisberg17/tic-tac-toe.git
 cd tic-tac-toe
 
 
@@ -67,10 +67,14 @@ dotnet run
 Como:
 
 1. Tela inicial.
+![Screenshot_20250124-113952](https://github.com/user-attachments/assets/d66b3d0a-765d-4f2b-ab12-658d1c3851ae)
 
 2. Jogo em andamento.
+![Screenshot_20250124-113942](https://github.com/user-attachments/assets/8aee0534-dcaf-4706-8f30-5dbd11dc9d17)
 
 3. Modo contra o computador.
+![Screenshot_20250124-113849](https://github.com/user-attachments/assets/4b6b9225-3bb5-4290-8384-a90b6a0f92ff)
+
 
 📚 Como Jogar
 
