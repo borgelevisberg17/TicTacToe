@@ -1,0 +1,364 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    
+    xmlns:local="clr-namespace:TicTacToe"
+    
+    xmlns:audio="clr-namespace:Plugin.Maui.Audio;assembly=Plugin.Maui.Audio"
+    
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="TicTacToe.MainPage"
+    BackgroundColor="#121212">
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior
+            StatusBarColor="#121212"
+            StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style
+                x:Key="DropdownButtonStyle"
+                TargetType="Button">
+                <Setter
+                    Property="BackgroundColor"
+                    Value="#2C2C2C" />
+                <Setter
+                    Property="TextColor"
+                    Value="#FFFFFF" />
+                <Setter
+                    Property="FontSize"
+                    Value="14" />
+                <Setter
+                    Property="FontAttributes"
+                    Value="Bold" />
+                <Setter
+                    Property="CornerRadius"
+                    Value="20" />
+                <Setter
+                    Property="Padding"
+                    Value="15,10" />
+                <Setter
+                    Property="ContentLayout"
+                    Value="Right" />
+            </Style>
+            <Style
+                x:Key="GameButtonStyle"
+                TargetType="Button">
+                <Setter
+                    Property="FontSize"
+                    Value="36" />
+                <Setter
+                    Property="FontAttributes"
+                    Value="Bold" />
+                <Setter
+                    Property="Margin"
+                    Value="4" />
+                <Setter
+                    Property="BackgroundColor"
+                    Value="Transparent" />
+                <Setter
+                    Property="TextColor"
+                    Value="#BB86FC" />
+                <Setter
+                    Property="CornerRadius"
+                    Value="15" />
+                <Setter
+                    Property="BorderColor"
+                    Value="#03DAC6" />
+                <Setter
+                    Property="BorderWidth"
+                    Value="2" />
+                <Setter
+                    Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup
+                            x:Name="CommonStates">
+                            <VisualState
+                                x:Name="Normal" />
+                            <VisualState
+                                x:Name="Pressed">
+                                <VisualState.Setters>
+                                    <Setter
+                                        Property="Scale"
+                                        Value="0.95" />
+                                    <Setter
+                                        Property="Opacity"
+                                        Value="0.8" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+            <Style
+                x:Key="ControlButtonStyle"
+                TargetType="Button">
+                <Setter
+                    Property="BackgroundColor"
+                    Value="#2C2C2C" />
+                <Setter
+                    Property="TextColor"
+                    Value="#FFFFFF" />
+                <Setter
+                    Property="FontSize"
+                    Value="14" />
+                <Setter
+                    Property="FontAttributes"
+                    Value="Bold" />
+                <Setter
+                    Property="CornerRadius"
+                    Value="10" />
+                <Setter
+                    Property="Padding"
+                    Value="10" />
+                <Setter
+                    Property="HeightRequest"
+                    Value="50" />
+                <Setter
+                    Property="ContentLayout"
+                    Value="Top,5" />
+            </Style>
+            <Style
+                x:Key="DropdownItemStyle"
+                TargetType="Button">
+                <Setter
+                    Property="BackgroundColor"
+                    Value="#4C4C4C" />
+                <Setter
+                    Property="TextColor"
+                    Value="#FFFFFF" />
+                <Setter
+                    Property="FontSize"
+                    Value="14" />
+                <Setter
+                    Property="CornerRadius"
+                    Value="8" />
+                <Setter
+                    Property="Padding"
+                    Value="15,10" />
+                <Setter
+                    Property="MinimumWidthRequest"
+                    Value="80" />
+            </Style>
+            <Style
+                x:Key="IconButtonStyle"
+                TargetType="Button">
+                <Setter
+                    Property="BackgroundColor"
+                    Value="#2C2C2C" />
+                <Setter
+                    Property="CornerRadius"
+                    Value="25" />
+                <Setter
+                    Property="TextColor"
+                    Value="#BB86FC" />
+                <Setter
+                    Property="Padding"
+                    Value="0" />
+                <Setter
+                    Property="WidthRequest"
+                    Value="120" />
+                <Setter
+                    Property="HeightRequest"
+                    Value="50" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid
+        RowDefinitions="Auto,Auto,Auto,*,Auto, Auto, Auto"
+        Padding="20"
+        RowSpacing="20">
+        <Label
+            Text="Jogo da Velha"
+            FontSize="42"
+            FontAttributes="Bold"
+            TextColor="#BB86FC"
+            HorizontalTextAlignment="Center">
+            <Label.Shadow>
+                <Shadow
+                    Brush="#03DAC6"
+                    Offset="2,2"
+                    Radius="5"
+                    Opacity="0.5" />
+            </Label.Shadow>
+        </Label>
+        <Label
+            Grid.Row="1"
+            x:Name="ScoreLabel"
+            Text="X: 0 | O: 0"
+            FontSize="28"
+            TextColor="#03DAC6"
+            HorizontalOptions="Center">
+            <Label.Shadow>
+                <Shadow
+                    Brush="#BB86FC"
+                    Offset="1,1"
+                    Radius="3"
+                    Opacity="0.3" />
+            </Label.Shadow>
+        </Label>
+        <Label
+            Grid.Row="2"
+            Text="@borge.levisberg"
+            FontSize="14"
+            TextColor="#03DAC6"
+            HorizontalOptions="Center">
+            <Label.Shadow>
+                <Shadow
+                    Brush="#BB86FC"
+                    Offset="1,1"
+                    Radius="3"
+                    Opacity="0.3" />
+            </Label.Shadow>
+        </Label>
+        <Frame
+            Grid.Row="3"
+            BackgroundColor="#1E1E1E"
+            CornerRadius="25"
+            Padding="15"
+            HasShadow="True">
+            <Grid
+                x:Name="GameGrid"
+                RowDefinitions="*,*,*"
+                ColumnDefinitions="*,*,*"
+                RowSpacing="10"
+                ColumnSpacing="10">
+                <Button
+                    x:Name="Button00"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Style="{StaticResource GameButtonStyle}"
+                    Clicked="OnButtonClicked" />
+                <Button
+                    x:Name="Button01"
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Style="{StaticResource GameButtonStyle}"
+                    Clicked="OnButtonClicked" />
+                <Button
+                    x:Name="Button02"
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    Style="{StaticResource GameButtonStyle}"
+                    Clicked="OnButtonClicked" />
+                <Button
+                    x:Name="Button10"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Style="{StaticResource GameButtonStyle}"
+                    Clicked="OnButtonClicked" />
+                <Button
+                    x:Name="Button11"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Style="{StaticResource GameButtonStyle}"
+                    Clicked="OnButtonClicked" />
+                <Button
+                    x:Name="Button12"
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Style="{StaticResource GameButtonStyle}"
+                    Clicked="OnButtonClicked" />
+                <Button
+                    x:Name="Button20"
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Style="{StaticResource GameButtonStyle}"
+                    Clicked="OnButtonClicked" />
+                <Button
+                    x:Name="Button21"
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Style="{StaticResource GameButtonStyle}"
+                    Clicked="OnButtonClicked" />
+                <Button
+                    x:Name="Button22"
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    Style="{StaticResource GameButtonStyle}"
+                    Clicked="OnButtonClicked" />
+            </Grid>
+        </Frame>
+        <Grid
+            Grid.Row="4"
+            ColumnDefinitions="*,*,*"
+            ColumnSpacing="10"
+            RowDefinitions="Auto,Auto"
+            Margin="0,20,0,0"
+            RowSpacing="15">
+            <Button
+                Grid.Column="0"
+                Text="Reiniciar"
+                Style="{StaticResource ControlButtonStyle}"
+                Clicked="OnRestartButtonClicked">
+                <Button.ImageSource>
+                    <FontImageSource
+                        FontFamily="MaterialIcons"
+                        Glyph=""
+                        Color="#FFFFFF"
+                        Size="24" />
+                </Button.ImageSource>
+            </Button>
+            <Button
+                Grid.Column="1"
+                x:Name="modeButton"
+                Text="Modo"
+                Style="{StaticResource ControlButtonStyle}"
+                Clicked="OnToggleModeClicked">
+                <Button.ImageSource>
+                    <FontImageSource
+                        FontFamily="MaterialIcons"
+                        Glyph=""
+                        Color="#FFFFFF"
+                        Size="24" />
+                </Button.ImageSource>
+            </Button>
+            <Button
+                Grid.Column="2"
+                x:Name="DifficultyButton"
+                Text="Dificuldade"
+                Style="{StaticResource ControlButtonStyle}"
+                Clicked="OnDifficultyButtonClicked">
+                <Button.ImageSource>
+                    <FontImageSource
+                        FontFamily="MaterialIcons"
+                        Glyph=""
+                        Color="#FFFFFF"
+                        Size="24" />
+                </Button.ImageSource>
+            </Button>
+            <Frame
+                Grid.Row="1"
+                Grid.ColumnSpan="3"
+                x:Name="DropdownFrame"
+                IsVisible="False"
+                BackgroundColor="#3C3C3C"
+                CornerRadius="15"
+                Padding="10"
+                HasShadow="True">
+                <StackLayout
+                    Orientation="Horizontal"
+                    HorizontalOptions="Center"
+                    Spacing="10">
+                    <Button
+                        Text="Fácil"
+                        Style="{StaticResource DropdownItemStyle}"
+                        Clicked="OnDifficultySelected"
+                        ClassId="0" />
+                    <Button
+                        Text="Médio"
+                        Style="{StaticResource DropdownItemStyle}"
+                        Clicked="OnDifficultySelected"
+                        ClassId="1" />
+                    <Button
+                        Text="Difícil"
+                        Style="{StaticResource DropdownItemStyle}"
+                        Clicked="OnDifficultySelected"
+                        ClassId="2" />
+                </StackLayout>
+            </Frame>
+        </Grid>
+    </Grid>
+</ContentPage>
