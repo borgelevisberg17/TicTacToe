@@ -26,5 +26,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Plugin.Maui.Audio" Version="3.0.1" />
+    <PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
   </ItemGroup>
 </Project>
