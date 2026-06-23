@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.Maui;
 using System.Collections.Generic;
 using Microsoft.Maui.Storage;
+using Microsoft.Maui.Devices;
 using Plugin.Maui.Audio;
 
 namespace TicTacToe
@@ -66,6 +67,31 @@ namespace TicTacToe
             await this.FadeTo(1, 1000);
             await Task.Delay(1000); // Adicione um atraso de 1 segundo
             await PlayBackgroundMusicAsync();
+
+            CheckFirstTimeLaunch();
+        }
+
+        private void CheckFirstTimeLaunch()
+        {
+            bool hasShownTutorial = Preferences.Default.Get("HasShownTutorial", false);
+            if (!hasShownTutorial)
+            {
+                ShowTutorial();
+            }
+        }
+
+        private async void ShowTutorial()
+        {
+            TutorialOverlay.IsVisible = true;
+            TutorialOverlay.Opacity = 0;
+            await TutorialOverlay.FadeTo(1, 500, Easing.CubicOut);
+        }
+
+        private async void OnCloseTutorialClicked(object sender, EventArgs e)
+        {
+            Preferences.Default.Set("HasShownTutorial", true);
+            await TutorialOverlay.FadeTo(0, 300, Easing.CubicIn);
+            TutorialOverlay.IsVisible = false;
         }
 
 
@@ -77,7 +103,8 @@ namespace TicTacToe
             currentPlayer = "X";
             board = new string[3, 3];
 
-            ScoreLabel.Text = "X: 0 | O: 0";
+            UpdateScoreDisplay();
+            UpdateTurnIndicator();
 
             foreach (var child in GameGrid.Children)
             {
@@ -165,28 +192,31 @@ namespace TicTacToe
             if (sender is Button button && string.IsNullOrEmpty(button.Text))
             {
                 button.Text = currentPlayer;
+                button.TextColor = currentPlayer == "X" ? (Color)Resources["PrimaryColor"] : (Color)Resources["AccentColor"];
+                await AnimateMove(button);
+
                 var row = Grid.GetRow(button);
                 var col = Grid.GetColumn(button);
                 board[row, col] = currentPlayer;
 
-                if (CheckWinner(row, col))
+                if (IsWinner(currentPlayer, out var winningCells))
                 {
                     UpdateScore();
-                    await DisplayAlert("Fim da Rodada", $"{currentPlayer} venceu esta rodada!", "OK");
-                    await ResetRound();
+                    await HighlightWinningCells(winningCells);
+                    ShowGameOverOverlay($"{currentPlayer} venceu!", true);
                 }
                 else if (IsBoardFull())
                 {
-                    await DisplayAlert("Fim da Rodada", "Empate!", "OK");
-                    await ResetRound();
+                    ShowGameOverOverlay("Empate!", false);
                 }
                 else
                 {
                     currentPlayer = currentPlayer == "X" ? "O" : "X";
+                    UpdateTurnIndicator();
 
                     if (isComputerMode && currentPlayer == "O")
                     {
-                        await Task.Delay(500); // Simular tempo de "pensamento" do computador
+                        await Task.Delay(800); // Simular tempo de "pensamento" do computador
                         MakeComputerMove();
                     }
                 }
@@ -251,26 +281,29 @@ namespace TicTacToe
             }
         }
 
-        private void ExecuteMove(int row, int col)
+        private async void ExecuteMove(int row, int col)
         {
             Button button = GetButtonByPosition(row, col);
             button.Text = currentPlayer;
+            button.TextColor = currentPlayer == "X" ? (Color)Resources["PrimaryColor"] : (Color)Resources["AccentColor"];
+            await AnimateMove(button);
+
             board[row, col] = currentPlayer;
 
-            if (CheckWinner(row, col))
+            if (IsWinner(currentPlayer, out var winningCells))
             {
                 UpdateScore();
-                DisplayAlert("Fim da Rodada", $"{currentPlayer} venceu esta rodada!", "OK");
-                ResetRound();
+                await HighlightWinningCells(winningCells);
+                ShowGameOverOverlay($"{currentPlayer} venceu!", true);
             }
             else if (IsBoardFull())
             {
-                DisplayAlert("Fim da Rodada", "Empate!", "OK");
-                ResetRound();
+                ShowGameOverOverlay("Empate!", false);
             }
             else
             {
                 currentPlayer = currentPlayer == "X" ? "O" : "X";
+                UpdateTurnIndicator();
             }
         }
 
@@ -305,25 +338,90 @@ namespace TicTacToe
             return (bestScore, bestMove);
         }
 
-        private bool IsWinner(string player)
+        private bool IsWinner(string player, out List<(int row, int col)> winningCells)
         {
+            winningCells = new List<(int, int)>();
+
+            // Rows
             for (int i = 0; i < 3; i++)
             {
-                if ((board[i, 0] == player && board[i, 1] == player && board[i, 2] == player) ||
-                    (board[0, i] == player && board[1, i] == player && board[2, i] == player))
+                if (board[i, 0] == player && board[i, 1] == player && board[i, 2] == player)
+                {
+                    winningCells.AddRange(new[] { (i, 0), (i, 1), (i, 2) });
                     return true;
+                }
             }
 
-            if ((board[0, 0] == player && board[1, 1] == player && board[2, 2] == player) ||
-                (board[0, 2] == player && board[1, 1] == player && board[2, 0] == player))
+            // Columns
+            for (int i = 0; i < 3; i++)
+            {
+                if (board[0, i] == player && board[1, i] == player && board[2, i] == player)
+                {
+                    winningCells.AddRange(new[] { (0, i), (1, i), (2, i) });
+                    return true;
+                }
+            }
+
+            // Diagonals
+            if (board[0, 0] == player && board[1, 1] == player && board[2, 2] == player)
+            {
+                winningCells.AddRange(new[] { (0, 0), (1, 1), (2, 2) });
                 return true;
+            }
+            if (board[0, 2] == player && board[1, 1] == player && board[2, 0] == player)
+            {
+                winningCells.AddRange(new[] { (0, 2), (1, 1), (2, 0) });
+                return true;
+            }
 
             return false;
         }
 
-        private bool CheckWinner(int row, int col)
+        private bool IsWinner(string player)
         {
-            return IsWinner(currentPlayer);
+            return IsWinner(player, out _);
+        }
+
+        private async Task AnimateMove(Button button)
+        {
+            try
+            {
+                if (HapticFeedback.Default.IsSupported)
+                    HapticFeedback.Default.Perform(HapticFeedbackType.Click);
+            }
+            catch { }
+
+            button.BackgroundColor = (Color)Resources["SurfaceColor"];
+            button.Scale = 0.5;
+            button.Opacity = 0;
+            await Task.WhenAll(
+                button.ScaleTo(1, 200, Easing.BackOut),
+                button.FadeTo(1, 200)
+            );
+        }
+
+        private async Task HighlightWinningCells(List<(int row, int col)> cells)
+        {
+            try
+            {
+                if (HapticFeedback.Default.IsSupported)
+                    HapticFeedback.Default.Perform(HapticFeedbackType.LongPress);
+            }
+            catch { }
+
+            var winningColor = currentPlayer == "X" ? (Color)Resources["PrimaryColor"] : (Color)Resources["AccentColor"];
+            var tasks = new List<Task>();
+
+            foreach (var cell in cells)
+            {
+                var button = GetButtonByPosition(cell.row, cell.col);
+                tasks.Add(button.ScaleTo(1.1, 300, Easing.CubicInOut));
+                button.BackgroundColor = winningColor.WithAlpha(0.3f);
+                button.TextColor = Colors.White;
+            }
+
+            await Task.WhenAll(tasks);
+            await Task.Delay(500);
         }
 
         private Button GetButtonByPosition(int row, int col)
@@ -348,26 +446,69 @@ namespace TicTacToe
             else
                 scoreO++;
 
-            ScoreLabel.Text = $"X: {scoreX} | O: {scoreO}";
+            UpdateScoreDisplay();
+        }
+
+        private void UpdateScoreDisplay()
+        {
+            ScoreXLabel.Text = scoreX.ToString();
+            ScoreOLabel.Text = scoreO.ToString();
+        }
+
+        private void UpdateTurnIndicator()
+        {
+            TurnLabel.Text = $"PLAYER {currentPlayer}";
+            var accentColor = (Color)Resources["AccentColor"];
+            var primaryColor = (Color)Resources["PrimaryColor"];
+            TurnIndicatorFrame.BackgroundColor = currentPlayer == "X" ? primaryColor : accentColor;
+        }
+
+        private async void ShowGameOverOverlay(string message, bool isVictory)
+        {
+            ResultMessageLabel.Text = message;
+
+            if (isVictory)
+            {
+                ResultTitleLabel.Text = "VITÓRIA!";
+                ResultIconLabel.Text = "\ue801"; // trophy
+                ResultIconLabel.TextColor = (Color)Resources["PrimaryColor"];
+            }
+            else
+            {
+                ResultTitleLabel.Text = "EMPATE";
+                ResultIconLabel.Text = "\ue8d4"; // swap
+                ResultIconLabel.TextColor = Colors.Gray;
+            }
+
+            GameOverOverlay.IsVisible = true;
+            GameOverOverlay.Opacity = 0;
+            await GameOverOverlay.FadeTo(1, 400, Easing.CubicOut);
+        }
+
+        private async void OnPlayAgainClicked(object sender, EventArgs e)
+        {
+            await GameOverOverlay.FadeTo(0, 200, Easing.CubicIn);
+            GameOverOverlay.IsVisible = false;
+            await ResetRound();
         }
 
         private async Task ResetRound()
         {
+            var surfaceColor = (Color)Resources["SurfaceColor"];
             foreach (var child in GameGrid.Children)
             {
                 if (child is Button button)
                 {
                     button.Text = string.Empty;
-                    Device.BeginInvokeOnMainThread(async () =>
-                    {
-                        await button.FadeTo(0, 200);
-                        await button.FadeTo(1, 200);
-                    });
+                    button.BackgroundColor = surfaceColor;
+                    button.Scale = 1;
+                    button.Opacity = 1;
                 }
             }
 
             board = new string[3, 3];
             currentPlayer = "X";
+            UpdateTurnIndicator();
         }
 
     }
