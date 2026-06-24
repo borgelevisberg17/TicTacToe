@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Microsoft.Maui.Storage;
 using Microsoft.Maui.Devices;
 using Plugin.Maui.Audio;
+using Microsoft.Maui.Graphics;
 
 namespace TicTacToe
 {
@@ -25,12 +26,22 @@ namespace TicTacToe
         private readonly IAudioManager audioManager;
         private IAudioPlayer backgroundMusicPlayer;
 
+        // 1. ADICIONE ESTE CONSTRUTOR VAZIO (Necessário para o gerador do XAML)
+        public MainPage()
+        {
+            InitializeComponent();
+            this.audioManager = Plugin.Maui.Audio.AudioManager.Current;
+            ResetRound();
+            _ = PlayBackgroundMusicAsync();
+        }
+
+        // 2. MANTENHA O SEU CONSTRUTOR COM PARÂMETROS
         public MainPage(IAudioManager audioManager)
         {
             InitializeComponent();
             this.audioManager = audioManager;
             ResetRound();
-            _ = PlayBackgroundMusicAsync(); // Corrigido para usar o novo nome do método
+            _ = PlayBackgroundMusicAsync();
         }
 
         private async Task PlayBackgroundMusicAsync()
@@ -395,7 +406,7 @@ namespace TicTacToe
             button.Scale = 0.5;
             button.Opacity = 0;
             await Task.WhenAll(
-                button.ScaleTo(1, 200, Easing.BackOut),
+                button.ScaleTo(1, 200, Easing.SpringOut),
                 button.FadeTo(1, 200)
             );
         }

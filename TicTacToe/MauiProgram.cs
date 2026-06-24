@@ -21,10 +21,11 @@ public static class MauiProgram
                 fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
             });
 
+        // Correção aqui: Mapeia explicitamente a interface IAudioManager para o AudioManager.Current
+        builder.Services.AddSingleton<IAudioManager>(AudioManager.Current);
 
-        builder.Services.AddSingleton(AudioManager.Current);
-        builder.Services.AddSingleton<MainPage>();
-
+        // Registra a MainPage como Transient (boa prática para ciclo de vida de páginas no MAUI)
+        builder.Services.AddTransient<MainPage>();
 
         return builder.Build();
     }
