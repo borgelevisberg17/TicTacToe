@@ -24,14 +24,14 @@ namespace TicTacToe
         private Random random = new Random();
 
         private readonly IAudioManager audioManager;
-        private IAudioPlayer backgroundMusicPlayer;
+        private IAudioPlayer? backgroundMusicPlayer;
 
         // 1. ADICIONE ESTE CONSTRUTOR VAZIO (Necessário para o gerador do XAML)
         public MainPage()
         {
             InitializeComponent();
             this.audioManager = Plugin.Maui.Audio.AudioManager.Current;
-            ResetRound();
+            _ = ResetRound();
             _ = PlayBackgroundMusicAsync();
         }
 
@@ -40,7 +40,7 @@ namespace TicTacToe
         {
             InitializeComponent();
             this.audioManager = audioManager;
-            ResetRound();
+            _ = ResetRound();
             _ = PlayBackgroundMusicAsync();
         }
 
@@ -75,7 +75,7 @@ namespace TicTacToe
         {
             base.OnAppearing();
             this.Opacity = 0;
-            await this.FadeTo(1, 1000);
+            await this.FadeToAsync(1, 1000);
             await Task.Delay(1000); // Adicione um atraso de 1 segundo
             await PlayBackgroundMusicAsync();
 
@@ -95,13 +95,13 @@ namespace TicTacToe
         {
             TutorialOverlay.IsVisible = true;
             TutorialOverlay.Opacity = 0;
-            await TutorialOverlay.FadeTo(1, 500, Easing.CubicOut);
+            await TutorialOverlay.FadeToAsync(1, 500, Easing.CubicOut);
         }
 
-        private async void OnCloseTutorialClicked(object sender, EventArgs e)
+        private async void OnCloseTutorialClicked(object? sender, EventArgs e)
         {
             Preferences.Default.Set("HasShownTutorial", true);
-            await TutorialOverlay.FadeTo(0, 300, Easing.CubicIn);
+            await TutorialOverlay.FadeToAsync(0, 300, Easing.CubicIn);
             TutorialOverlay.IsVisible = false;
         }
 
@@ -122,21 +122,21 @@ namespace TicTacToe
                 if (child is Button button)
                 {
                     button.Text = string.Empty;
-                    await button.FadeTo(0, 200);
-                    await button.FadeTo(1, 200);
+                    await button.FadeToAsync(0, 200);
+                    await button.FadeToAsync(1, 200);
                 }
             }
 
-            await GameGrid.ScaleTo(0.8, 200, Easing.CubicOut);
-            await GameGrid.ScaleTo(1, 200, Easing.CubicIn);
+            await GameGrid.ScaleToAsync(0.8, 200, Easing.CubicOut);
+            await GameGrid.ScaleToAsync(1, 200, Easing.CubicIn);
         }
 
-        private async void OnRestartButtonClicked(object sender, EventArgs e)
+        private async void OnRestartButtonClicked(object? sender, EventArgs e)
         {
             await RestartGame();
         }
 
-        private async void OnToggleModeClicked(object sender, EventArgs e)
+        private async void OnToggleModeClicked(object? sender, EventArgs e)
         {
             isComputerMode = !isComputerMode;
             await RestartGame();
@@ -168,23 +168,23 @@ namespace TicTacToe
         }
 
 
-        private async void OnDifficultyButtonClicked(object sender, EventArgs e)
+        private async void OnDifficultyButtonClicked(object? sender, EventArgs e)
         {
             if (!DropdownFrame.IsVisible)
             {
                 DropdownFrame.TranslationY = DropdownFrame.Height;
                 DropdownFrame.IsVisible = true;
-                await DropdownFrame.TranslateTo(0, 0, 250, Easing.CubicOut);
+                await DropdownFrame.TranslateToAsync(0, 0, 250, Easing.CubicOut);
             }
             else
             {
-                await DropdownFrame.TranslateTo(0, DropdownFrame.Height, 250, Easing.CubicIn);
+                await DropdownFrame.TranslateToAsync(0, DropdownFrame.Height, 250, Easing.CubicIn);
                 DropdownFrame.IsVisible = false;
             }
         }
 
 
-        private void OnDifficultySelected(object sender, EventArgs e)
+        private void OnDifficultySelected(object? sender, EventArgs e)
         {
             if (sender is Button button)
             {
@@ -198,7 +198,7 @@ namespace TicTacToe
 
 
 
-        private async void OnButtonClicked(object sender, EventArgs e)
+        private async void OnButtonClicked(object? sender, EventArgs e)
         {
             if (sender is Button button && string.IsNullOrEmpty(button.Text))
             {
@@ -406,8 +406,8 @@ namespace TicTacToe
             button.Scale = 0.5;
             button.Opacity = 0;
             await Task.WhenAll(
-                button.ScaleTo(1, 200, Easing.SpringOut),
-                button.FadeTo(1, 200)
+                button.ScaleToAsync(1, 200, Easing.SpringOut),
+                button.FadeToAsync(1, 200)
             );
         }
 
@@ -426,7 +426,7 @@ namespace TicTacToe
             foreach (var cell in cells)
             {
                 var button = GetButtonByPosition(cell.row, cell.col);
-                tasks.Add(button.ScaleTo(1.1, 300, Easing.CubicInOut));
+                tasks.Add(button.ScaleToAsync(1.1, 300, Easing.CubicInOut));
                 button.BackgroundColor = winningColor.WithAlpha(0.3f);
                 button.TextColor = Colors.White;
             }
@@ -471,7 +471,7 @@ namespace TicTacToe
             TurnLabel.Text = $"PLAYER {currentPlayer}";
             var accentColor = (Color)Resources["AccentColor"];
             var primaryColor = (Color)Resources["PrimaryColor"];
-            TurnIndicatorFrame.BackgroundColor = currentPlayer == "X" ? primaryColor : accentColor;
+            TurnIndicatorFrame.Background = currentPlayer == "X" ? primaryColor : accentColor;
         }
 
         private async void ShowGameOverOverlay(string message, bool isVictory)
@@ -493,12 +493,12 @@ namespace TicTacToe
 
             GameOverOverlay.IsVisible = true;
             GameOverOverlay.Opacity = 0;
-            await GameOverOverlay.FadeTo(1, 400, Easing.CubicOut);
+            await GameOverOverlay.FadeToAsync(1, 400, Easing.CubicOut);
         }
 
-        private async void OnPlayAgainClicked(object sender, EventArgs e)
+        private async void OnPlayAgainClicked(object? sender, EventArgs e)
         {
-            await GameOverOverlay.FadeTo(0, 200, Easing.CubicIn);
+            await GameOverOverlay.FadeToAsync(0, 200, Easing.CubicIn);
             GameOverOverlay.IsVisible = false;
             await ResetRound();
         }

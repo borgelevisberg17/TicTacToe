@@ -9,12 +9,17 @@ namespace TicTacToe
 {
     public partial class App : Application
     {
+        private readonly IServiceProvider _serviceProvider;
+
         public App(IServiceProvider serviceProvider)
         {
             InitializeComponent();
-            MainPage = serviceProvider.GetRequiredService<MainPage>();
-
+            _serviceProvider = serviceProvider;
         }
 
+        protected override Window CreateWindow(IActivationState? activationState)
+        {
+            return new Window(_serviceProvider.GetRequiredService<MainPage>());
+        }
     }
 }
