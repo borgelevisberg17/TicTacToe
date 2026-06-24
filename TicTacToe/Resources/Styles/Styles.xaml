@@ -20,18 +20,6 @@
             Value="{AppThemeBinding Light={StaticResource Gray950}, Dark={StaticResource Gray100}}" />
     </Style>
     <Style
-        TargetType="Border">
-        <Setter
-            Property="Stroke"
-            Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray500}}" />
-        <Setter
-            Property="StrokeShape"
-            Value="Rectangle" />
-        <Setter
-            Property="StrokeThickness"
-            Value="1" />
-    </Style>
-    <Style
         TargetType="BoxView">
         <Setter
             Property="BackgroundColor"
@@ -244,16 +232,13 @@
         </Setter>
     </Style>
     <Style
-        TargetType="Frame">
+        TargetType="Border">
         <Setter
-            Property="HasShadow"
-            Value="False" />
-        <Setter
-            Property="BorderColor"
+            Property="Stroke"
             Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray950}}" />
         <Setter
-            Property="CornerRadius"
-            Value="8" />
+            Property="StrokeShape"
+            Value="RoundRectangle 8" />
     </Style>
     <Style
         TargetType="ImageButton">
@@ -366,15 +351,6 @@
         <Setter
             Property="HorizontalTextAlignment"
             Value="Center" />
-    </Style>
-    <Style
-        TargetType="ListView">
-        <Setter
-            Property="SeparatorColor"
-            Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray500}}" />
-        <Setter
-            Property="RefreshControlColor"
-            Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}" />
     </Style>
     <Style
         TargetType="Picker">
