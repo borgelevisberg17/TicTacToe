@@ -26,22 +26,11 @@ namespace TicTacToe
         private readonly IAudioManager audioManager;
         private IAudioPlayer? backgroundMusicPlayer;
 
-        // 1. ADICIONE ESTE CONSTRUTOR VAZIO (Necessário para o gerador do XAML)
-        public MainPage()
-        {
-            InitializeComponent();
-            this.audioManager = Plugin.Maui.Audio.AudioManager.Current;
-            _ = ResetRound();
-            _ = PlayBackgroundMusicAsync();
-        }
-
-        // 2. MANTENHA O SEU CONSTRUTOR COM PARÂMETROS
         public MainPage(IAudioManager audioManager)
         {
             InitializeComponent();
             this.audioManager = audioManager;
             _ = ResetRound();
-            _ = PlayBackgroundMusicAsync();
         }
 
         private async Task PlayBackgroundMusicAsync()
@@ -74,10 +63,14 @@ namespace TicTacToe
         protected override async void OnAppearing()
         {
             base.OnAppearing();
+
+            if (backgroundMusicPlayer == null || !backgroundMusicPlayer.IsPlaying)
+            {
+                await PlayBackgroundMusicAsync();
+            }
+
             this.Opacity = 0;
             await this.FadeToAsync(1, 1000);
-            await Task.Delay(1000); // Adicione um atraso de 1 segundo
-            await PlayBackgroundMusicAsync();
 
             CheckFirstTimeLaunch();
         }
